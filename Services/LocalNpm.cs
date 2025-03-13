@@ -25,16 +25,15 @@ namespace weather.Services
                 return !context.Request.Path.StartsWithSegments("/swagger") &&
                        !apiRoutes.Any(route => context.Request.Path.Value.StartsWith(route));
             }
-                        , spa =>
-                        {
-                            spa.UseSpa(spaBuilder =>
-                            {
-                                spaBuilder.Options.SourcePath = "clientapp";
-                                spaBuilder.Options.DevServerPort = 5173;
-                                spaBuilder.Options.DefaultPage = "/";
-                                spaBuilder.UseReactDevelopmentServer(npmScript: "start");
-                            });
-                        });
+            , spa =>
+            {
+                spa.UseSpa(spaBuilder =>
+                {
+                    spaBuilder.Options.SourcePath = "clientapp";
+                    spaBuilder.Options.DevServerPort = 5173;
+                    spaBuilder.UseReactDevelopmentServer(npmScript: "start");
+                });
+            });
         }
     }
 }
