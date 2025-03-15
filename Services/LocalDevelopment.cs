@@ -4,7 +4,7 @@ namespace weather.Services
 {
     public static class LocalDevelopment
     {
-        public static void NpmRunDev(WebApplication app)
+        public static void NpmRunDev(this WebApplication app)
         {
             app.MapWhen(context =>
             {

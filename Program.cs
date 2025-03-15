@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.OpenApi.Models;
 using weather.Services;
 
@@ -24,8 +23,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Configure the HTTP server
-var port = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://+:5057";
-builder.WebHost.UseUrls(port);
+var port = builder.Configuration["Port"] ?? "5057";
+builder.WebHost.UseUrls($"http://+:{port}");
 
 var app = builder.Build();
 
@@ -43,7 +42,7 @@ if (!app.Environment.IsDevelopment())
 else
 {
     // In development, use the React development server
-    LocalDevelopment.NpmRunDev(app);
+    app.NpmRunDev();
 }
 
 app.UseSwagger();
