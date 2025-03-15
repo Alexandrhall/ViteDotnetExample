@@ -10,12 +10,13 @@ interface WeatherForecast {
 const Weather: React.FC = () => {
   const [forecast, setForecast] = useState<WeatherForecast[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const backendUrl = "http://localhost:5057";
 
   useEffect(() => {
     const fetchWeatherData = async () => {
       try {
         const response = await axios.get<WeatherForecast[]>(
-          "http://localhost:5057/weatherforecast"
+          `${backendUrl}/weatherforecast`
         );
         setForecast(response.data);
       } catch (error) {

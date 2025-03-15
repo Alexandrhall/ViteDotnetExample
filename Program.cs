@@ -2,58 +2,54 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.OpenApi.Models;
 using weather.Services;
 
-internal class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
+builder.Services.AddCors(options =>
 {
-    private static void Main(string[] args)
+    options.AddPolicy("AllowAllOrigins", policy =>
     {
-        var builder = WebApplication.CreateBuilder(args);
+        policy.AllowAnyOrigin()  // Allow all origins
+              .AllowAnyMethod()  // Allow all HTTP methods (GET, POST, etc.)
+              .AllowAnyHeader(); // Allow all headers
+    });
+});
 
-        builder.Services.AddOpenApi();
-        builder.Services.AddControllers();
-        builder.Services.AddControllersWithViews();
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAllOrigins", policy =>
-            {
-                policy.AllowAnyOrigin()  // Tillåter alla ursprung
-                      .AllowAnyMethod()  // Tillåter alla HTTP-metoder (GET, POST, etc.)
-                      .AllowAnyHeader(); // Tillåter alla headers
-            });
-        });
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherAPI", Version = "v1" });
+});
 
-        builder.Services.AddControllers();
-        builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherAPI", Version = "v1" });
-            });
+// Configure the HTTP server
+var port = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://+:5057";
+builder.WebHost.UseUrls(port);
 
-        var port = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://+:5057";
-        builder.WebHost.UseUrls(port);
+var app = builder.Build();
 
-        var app = builder.Build();
+// Configure the HTTP request pipeline
+app.UseCors("AllowAllOrigins");
+app.MapControllers();
 
-        app.UseCors("AllowAllOrigins");
-        app.MapControllers();
-
-        if (!app.Environment.IsDevelopment())
-        {
-            // I produktion använd statiska filer från wwwroot
-            app.UseStaticFiles();  // Serva React från wwwroot när den är byggd
-            app.MapFallbackToFile("index.html");
-            app.UseHttpsRedirection();
-        }
-        else
-        {
-            LocalNpm.NpmRunDev(app);
-        }
-
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherAPI V1");
-        });
-
-
-        app.Run();
-    }
+if (!app.Environment.IsDevelopment())
+{
+    // In production, serve static files from wwwroot
+    app.UseStaticFiles();  // Serve React from wwwroot when built
+    app.MapFallbackToFile("index.html");
+    app.UseHttpsRedirection();
 }
+else
+{
+    // In development, use the React development server
+    LocalDevelopment.NpmRunDev(app);
+}
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherAPI V1");
+});
+
+app.Run();

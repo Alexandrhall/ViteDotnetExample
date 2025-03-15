@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
 namespace weather.Services
 {
-    public static class LocalNpm
+    public static class LocalDevelopment
     {
         public static void NpmRunDev(WebApplication app)
         {
@@ -10,7 +10,7 @@ namespace weather.Services
             {
                 var endpointDataSource = app.Services.GetRequiredService<EndpointDataSource>();
 
-                // Hämta alla API-routes dynamiskt vid varje request
+                // Dynamically fetch all API routes for each request
                 var apiRoutes = endpointDataSource.Endpoints
                     .OfType<RouteEndpoint>()
                     .Select(e => "/" + e.RoutePattern.RawText)
@@ -20,8 +20,10 @@ namespace weather.Services
                     )
                     .ToList();
 
+                // Check if the request path is null
                 if (context.Request.Path.Value == null) return false;
 
+                // Exclude requests to Swagger and API routes
                 return !context.Request.Path.StartsWithSegments("/swagger") &&
                        !apiRoutes.Any(route => context.Request.Path.Value.StartsWith(route));
             }
@@ -29,8 +31,11 @@ namespace weather.Services
             {
                 spa.UseSpa(spaBuilder =>
                 {
+                    // Set the source path for the SPA
                     spaBuilder.Options.SourcePath = "clientapp";
                     spaBuilder.Options.DevServerPort = 5173;
+
+                    // Use React development server with the specified npm script
                     spaBuilder.UseReactDevelopmentServer(npmScript: "start");
                 });
             });

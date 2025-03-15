@@ -13,7 +13,7 @@ namespace weather.Controller
         [HttpGet]
         public string Get()
         {
-            return "Tjenare hallå där";
+            return "Hello, Test Api!";
         }
     }
 }

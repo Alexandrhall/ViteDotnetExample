@@ -24,7 +24,7 @@ namespace weather.Controller
                 .ToArray();
             return forecast;
         }
-        // Detta är den klass som användes tidigare i din Program.cs
+
         public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
         {
             public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
