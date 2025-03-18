@@ -3,6 +3,8 @@ using weather.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var config = builder.Configuration;
+
 // Add services to the container
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -21,10 +23,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherAPI", Version = "v1" });
 });
-
-// Configure the HTTP server
-var port = builder.Configuration["Port"] ?? "5057";
-builder.WebHost.UseUrls($"http://+:{port}");
 
 var app = builder.Build();
 

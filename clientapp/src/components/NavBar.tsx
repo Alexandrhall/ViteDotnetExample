@@ -4,7 +4,7 @@ const NavBar = () => {
   const list = [
     { "/": "Home" },
     { "/second": "Second" },
-    { "/blablablajsnda": "Trasig" },
+    { "/blablablajsnda": "Broken" },
   ];
 
   return (

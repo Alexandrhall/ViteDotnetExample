@@ -10,14 +10,11 @@ interface WeatherForecast {
 const Weather: React.FC = () => {
   const [forecast, setForecast] = useState<WeatherForecast[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const backendUrl = "http://localhost:5057";
 
   useEffect(() => {
     const fetchWeatherData = async () => {
       try {
-        const response = await axios.get<WeatherForecast[]>(
-          `${backendUrl}/weatherforecast`
-        );
+        const response = await axios.get<WeatherForecast[]>(`/weatherforecast`);
         setForecast(response.data);
       } catch (error) {
         console.error("Error fetching weather data:", error);
@@ -30,12 +27,12 @@ const Weather: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <p>Laddar väderprognos...</p>;
+    return <p>Laddar weather forecast...</p>;
   }
 
   return (
     <div>
-      <h1>Väderprognos</h1>
+      <h1>Weather forecast</h1>
       <ul>
         {forecast?.length > 0 &&
           forecast.map((forecastItem) => (

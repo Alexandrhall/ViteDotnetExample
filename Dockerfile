@@ -30,8 +30,14 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 COPY --from=backend-build /app/out ./
 
-# Expose port 5057
-EXPOSE 5057
+# Add a build argument for the port
+ARG PORT=5057
+
+# Set environment variable for ASP.NET Core URLs
+ENV ASPNETCORE_URLS=http://+:${PORT}
+
+# Expose the port
+EXPOSE ${PORT}
 
 # Start the application
 ENTRYPOINT ["dotnet", "weather.dll"]
