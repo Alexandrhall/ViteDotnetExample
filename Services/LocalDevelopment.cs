@@ -10,24 +10,23 @@ namespace weather.Services
             {
                 var endpointDataSource = app.Services.GetRequiredService<EndpointDataSource>();
 
-                // Dynamically fetch all API routes for each request
+                // // Get all API routes
                 var apiRoutes = endpointDataSource.Endpoints
                     .OfType<RouteEndpoint>()
-                    .Select(e => "/" + e.RoutePattern.RawText)
-                    .Union(endpointDataSource.Endpoints
-                        .OfType<RouteEndpoint>()
-                        .Select(e => "/" + e.RoutePattern.RawText?.ToLowerInvariant())
-                    )
+                    .SelectMany(e => new[] { "/" + e.RoutePattern.RawText,
+                     "/" + e.RoutePattern.RawText?.ToLowerInvariant() })
                     .ToList();
+                // Add Swagger route
+                apiRoutes.Add("/swagger");
 
                 // Check if the request path is null
                 if (context.Request.Path.Value == null) return false;
 
                 // Exclude requests to Swagger and API routes
-                return !context.Request.Path.StartsWithSegments("/swagger") &&
-                       !apiRoutes.Any(route => context.Request.Path.Value.StartsWith(route));
-            }
-            , spa =>
+                var isApiRoute = apiRoutes.Any(route => context.Request.Path.Value.StartsWith(route));
+                return !isApiRoute;
+
+            }, spa =>
             {
                 spa.UseSpa(spaBuilder =>
                 {
