@@ -1,5 +1,5 @@
 # ---- Build frontend ----
-FROM node:22 AS frontend-build
+FROM node:24 AS frontend-build
 
 WORKDIR /app/clientapp
 COPY clientapp/package.json clientapp/package-lock.json ./
@@ -8,7 +8,7 @@ COPY clientapp ./
 RUN npm run build
 
 # ---- Build backend ----
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS backend-build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-build
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN dotnet publish -c Release -o out
 COPY --from=frontend-build /app/clientapp/dist/ /app/out/wwwroot/
 
 # ---- Run application ----
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 WORKDIR /app
 COPY --from=backend-build /app/out ./
