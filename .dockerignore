@@ -2,4 +2,7 @@ bin/
 obj/
 node_modules/
 clientapp/node_modules/
-clientapp/build/
+clientapp/dist/
+.git/
+.vscode/
+    

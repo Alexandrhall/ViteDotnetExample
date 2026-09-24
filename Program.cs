@@ -1,24 +1,11 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using weather.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var config = builder.Configuration;
-
 // Add services to the container
-builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddControllersWithViews();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins", policy =>
-    {
-        policy.AllowAnyOrigin()  // Allow all origins
-              .AllowAnyMethod()  // Allow all HTTP methods (GET, POST, etc.)
-              .AllowAnyHeader(); // Allow all headers
-    });
-});
-
+builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "WeatherAPI", Version = "v1" });
@@ -27,27 +14,36 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-app.UseCors("AllowAllOrigins");
-app.UseRouting();
-app.MapControllers();
+// Swagger runs before the SPA handling so /swagger never reaches the frontend.
+// Toggle per environment with the EnableSwagger setting (env var: EnableSwagger=false)
+if (app.Configuration.GetValue("EnableSwagger", true))
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherAPI V1");
+    });
+}
 
 if (!app.Environment.IsDevelopment())
 {
-    // In production, serve static files from wwwroot
-    app.UseStaticFiles();  // Serve React from wwwroot when built
+    // In production, serve the built React app from wwwroot
+    app.UseStaticFiles();
+}
+
+app.UseRouting();
+app.MapControllers();
+app.MapHealthChecks("/health");
+
+if (!app.Environment.IsDevelopment())
+{
+    // Every path that doesn't match a controller is handled by React
     app.MapFallbackToFile("index.html");
-    app.UseHttpsRedirection();
 }
 else
 {
-    // In development, use the React development server
+    // In development, proxy every path that doesn't match a controller to the Vite dev server
     app.NpmRunDev();
 }
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WeatherAPI V1");
-});
 
 app.Run();

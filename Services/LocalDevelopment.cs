@@ -6,27 +6,9 @@ namespace weather.Services
     {
         public static void NpmRunDev(this WebApplication app)
         {
-            app.MapWhen(context =>
-            {
-                var endpointDataSource = app.Services.GetRequiredService<EndpointDataSource>();
-
-                // // Get all API routes
-                var apiRoutes = endpointDataSource.Endpoints
-                    .OfType<RouteEndpoint>()
-                    .SelectMany(e => new[] { "/" + e.RoutePattern.RawText,
-                     "/" + e.RoutePattern.RawText?.ToLowerInvariant() })
-                    .ToList();
-                // Add Swagger route
-                apiRoutes.Add("/swagger");
-
-                // Check if the request path is null
-                if (context.Request.Path.Value == null) return false;
-
-                // Exclude requests to Swagger and API routes
-                var isApiRoute = apiRoutes.Any(route => context.Request.Path.Value.StartsWith(route));
-                return !isApiRoute;
-
-            }, spa =>
+            // UseRouting has already run, so a request without an endpoint
+            // didn't match any controller and belongs to the frontend
+            app.MapWhen(context => context.GetEndpoint() is null, spa =>
             {
                 spa.UseSpa(spaBuilder =>
                 {

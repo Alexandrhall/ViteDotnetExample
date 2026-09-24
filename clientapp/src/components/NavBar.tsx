@@ -13,7 +13,7 @@ const NavBar = () => {
         {list.map((x) => {
           const [key, value] = Object.entries(x)[0];
           return (
-            <li>
+            <li key={key}>
               <Link to={key}>{value}</Link>
             </li>
           );
